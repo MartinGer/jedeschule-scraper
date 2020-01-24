@@ -1,13 +1,14 @@
 import re
-
 import scrapy
+import logging
+
 from scrapy import Item
 from scrapy.shell import inspect_response
 
 from jedeschule.items import School
 from jedeschule.spiders.school_spider import SchoolSpider
 from jedeschule.utils import cleanjoin
-import logging
+
 
 
 class RheinlandPfalzSpider(SchoolSpider):
@@ -84,9 +85,11 @@ class RheinlandPfalzSpider(SchoolSpider):
         return School(name=item.get('name'),
                       id='RP-{}'.format(item.get('id')),
                       address=item.get('Adresse'),
-                      city=item.get('Ort'),
+                      city=re.split('\d{5}', item.get('Ort').strip())[1].strip(),
+                      zip=re.findall('\d{5}', item.get('Ort'))[0],
                       website=item.get('Internet'),
                       email=item.get('E-Mail'),
                       school_type=item.get('Schulform'),
                       fax=item.get('Fax'),
                       phone=item.get('Telefon'))
+    
